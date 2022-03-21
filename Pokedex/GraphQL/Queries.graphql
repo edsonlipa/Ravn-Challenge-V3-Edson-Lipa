@@ -1,0 +1,16 @@
+
+query Pokemon($pokemonId: Int!) {
+  pokemon(id: $pokemonId) {
+    id
+    name
+    nat_dex_num
+  }
+}
+
+query AllPokemon {
+  allPokemon {
+    name
+    id
+  }
+}
+
