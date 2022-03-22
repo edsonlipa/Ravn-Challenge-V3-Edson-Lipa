@@ -12,7 +12,7 @@ struct PokemonListView: View {
     
     var body: some View {
         NavigationView {
-            List(listViewModel.pokemonList) { item in
+            List(listViewModel.pokemonsFiltered) { item in
                 NavigationLink(destination: EmptyView()) {
                     HStack {
                         AsyncImage(url: URL(string: item.defaultFrontalSprite)) { phase in
@@ -21,7 +21,6 @@ struct PokemonListView: View {
                                 ProgressView()
                             case .success(let image):
                                 image.resizable()
-                                    .interpolation(.none)
                                     .scaledToFit()
                                     .frame(width: 100, height: 100)
                             case .failure:
@@ -31,12 +30,13 @@ struct PokemonListView: View {
                             }
                         }
                         VStack {
-                            Text(item.name)
+                            Text((item.name?.capitalizingFirstLetter()) ?? item.name)
                             Text(String(format: "#%03d", item.id))
                         }
                     }
                     .padding()
                 }
+                .buttonStyle(PlainButtonStyle())
                 
             }
             .navigationTitle("Pokémon List")

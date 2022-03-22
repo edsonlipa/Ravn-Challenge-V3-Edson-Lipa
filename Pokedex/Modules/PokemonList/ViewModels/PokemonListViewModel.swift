@@ -11,6 +11,9 @@ import Apollo
 class PokemonListViewModel: ObservableObject {
     @Published var pokemonList: [PokemonListItem] = [PokemonListItem]()
     @Published var textToSearch: String = ""
+    var pokemonsFiltered: [PokemonListItem] {
+        return textToSearch == "" ? pokemonList : pokemonList.filter{ $0.name.lowercased().contains(textToSearch.lowercased())}
+    }
     
     init() {
         getallPokemons()
