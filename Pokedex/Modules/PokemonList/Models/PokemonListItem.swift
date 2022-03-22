@@ -6,9 +6,18 @@
 //
 
 import Foundation
-struct PokemonListItem {
-    var defaultFrontalSprite: String
-    var name: String
+struct PokemonListItem: Identifiable {
     var id: Int
-    var types: String
+    var defaultFrontalSprite: String!
+    var name: String!
+    var types: String!
 }
+
+//extension PokemonListItem {
+//    init?(_ pokemon: AllPokemonQuery.Data.AllPokemon){
+//        guard let userID = Int(pokemon.id!) else {
+//              return nil
+//            }
+//        
+//    }
+//}

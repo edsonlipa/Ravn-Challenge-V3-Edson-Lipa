@@ -1,16 +1,24 @@
-
-query Pokemon($pokemonId: Int!) {
-  pokemon(id: $pokemonId) {
+query AllPokemon($limit: Int) {
+  allPokemon(limit: $limit) {
     id
     name
-    nat_dex_num
+    types {
+      name
+      id
+      
+    }
+    sprites {
+      front_default
+      front_shiny
+    }
+    generation
+    dominant_color {
+      light
+      dark
+      original
+      r
+      g
+      b
+    }
   }
 }
-
-query AllPokemon {
-  allPokemon {
-    name
-    id
-  }
-}
-

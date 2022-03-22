@@ -6,8 +6,28 @@
 //
 
 import Foundation
+import Apollo
 
-class PokemonListViewModel {
-    var pokemonList: [PokemonListItem] = [PokemonListItem]()
+class PokemonListViewModel: ObservableObject {
+    @Published var pokemonList: [PokemonListItem] = [PokemonListItem]()
+    @Published var textToSearch: String = ""
     
+    init() {
+        getallPokemons()
+    }
+    
+    func getallPokemons() {
+//        let graphQLClient = ApolloClient(url: URL(string: "http://localhost:8080/graphql")!)
+        let allPokemons = Network.shared.apollo.fetch(query: AllPokemonQuery(limit: 5)) { [weak self] result in
+            switch result {
+            case .failure(let error):
+                print("Something bad happened \(error)")
+
+            case .success(let graphQLResult):
+                guard let data = graphQLResult.data?.allPokemon else { return }
+                self?.pokemonList = data.map{ PokemonListItem(id: Int($0?.id ?? 0), defaultFrontalSprite: $0?.sprites?.frontDefault, name: $0?.name, types: "Agua")}
+            }
+        }
+
+    }
 }
