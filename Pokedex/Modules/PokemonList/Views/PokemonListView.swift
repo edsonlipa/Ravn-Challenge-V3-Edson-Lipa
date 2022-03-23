@@ -13,43 +13,23 @@ struct PokemonListView: View {
     var body: some View {
         NavigationView {
             List(listViewModel.pokemonsFiltered) { item in
-                NavigationLink(destination: EmptyView()) {
-                    HStack {
-                        AsyncImage(url: URL(string: item.defaultFrontalSprite)) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                            case .success(let image):
-                                image.resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                            case .failure:
-                                Image(systemName: "photo")
-                            @unknown default:
-                                EmptyView()
-                            }
-                        }
-                        VStack {
-                            Text((item.name?.capitalizingFirstLetter()) ?? item.name)
-                            Text(String(format: "#%03d", item.id))
-                        }
-                    }
-                    .padding()
-                }
-                .buttonStyle(PlainButtonStyle())
-                
+                //NavigationLink(destination: EmptyView()) {
+                    PokemonListItemView(item: item)
+                    .frame(height: 80)
+                //}
+                .listRowBackground(Color(UIColor.systemGray6))
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
             }
             .navigationTitle("Pokémon List")
         }
         .searchable(
             text: $listViewModel.textToSearch,
             placement: .navigationBarDrawer(displayMode: .always))
-//        .onAppear {
-//            listViewModel.getallPokemons()
-//        }
-
     }
 }
+
+
 
 struct PokemonListView_Previews: PreviewProvider {
     static var previews: some View {
