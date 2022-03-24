@@ -7,12 +7,14 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 protocol PokeApiServiceType {
     func fetcPokemon(id: Int) -> AnyPublisher<PokeApiResponse, Error>
 }
 
 struct PokeApiService: PokeApiServiceType {
+    
     let baseURL = "https://pokeapi.co/api/v2"
     let decoder: JSONDecoder
     let session: URLSession
@@ -26,7 +28,7 @@ struct PokeApiService: PokeApiServiceType {
     }
     
     func fetcPokemon(id: Int) -> AnyPublisher<PokeApiResponse, Error> {
-        let finalURL = baseURL + "/pokemon/?id=\(id)"
+        let finalURL = baseURL + "/pokemon/\(id)"
 
         return session
             .dataTaskPublisher(for: URL(string: finalURL)!)
