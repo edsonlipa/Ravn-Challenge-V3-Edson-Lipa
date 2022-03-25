@@ -10,7 +10,8 @@ import Combine
 import SwiftUI
 
 protocol PokeApiServiceType {
-    func fetcPokemon(id: Int) -> AnyPublisher<PokeApiResponse, Error>
+    func fetchPokemonSpecies(id: Int) -> AnyPublisher<PokemonSpeciesResponse, Error>
+    func execute(for url: URL) -> AnyPublisher<Data, Error>
 }
 
 struct PokeApiService: PokeApiServiceType {
@@ -23,15 +24,30 @@ struct PokeApiService: PokeApiServiceType {
         decoder: JSONDecoder = JSONDecoder(),
         session: URLSession = .shared
     ) {
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
         self.decoder = decoder
         self.session = session
     }
     
-    func fetcPokemon(id: Int) -> AnyPublisher<PokeApiResponse, Error> {
+    func fetchPokemonSpecies(id: Int) -> AnyPublisher<PokemonSpeciesResponse, Error> {
+        let finalURL = baseURL + "/pokemon-species/\(id)"
+
+        return execute(for: URL(string: finalURL)!)
+            .decode(type: PokemonSpeciesResponse.self, decoder: decoder)
+            .eraseToAnyPublisher()
+    }
+    
+    func fetchPokemon(id: Int) -> AnyPublisher<PokemonResponse, Error> {
         let finalURL = baseURL + "/pokemon/\(id)"
 
-        return session
-            .dataTaskPublisher(for: URL(string: finalURL)!)
+        return execute(for: URL(string: finalURL)!)
+            .decode(type: PokemonResponse.self, decoder: decoder)
+            .eraseToAnyPublisher()
+    }
+    
+    func execute(for url: URL) -> AnyPublisher<Data, Error> {
+        session
+            .dataTaskPublisher(for: url)
             .tryMap { element -> Data in
                 guard let httpResponse = element.response as? HTTPURLResponse,
                     httpResponse.statusCode == 200
@@ -41,9 +57,6 @@ struct PokeApiService: PokeApiServiceType {
                 }
                 return element.data
             }
-            .decode(type: PokeApiResponse.self, decoder: decoder)
             .eraseToAnyPublisher()
     }
-    
-    
 }

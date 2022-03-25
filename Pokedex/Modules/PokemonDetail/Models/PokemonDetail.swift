@@ -8,5 +8,11 @@
 import Foundation
 
 struct PokemonDetail {
-    
+    let id: Int
+    let name: String
+    let types: [PokemonType]
+    let generation: String
+    let description: String
+    let defaultSprite: String
+    let shinySprite: String
 }

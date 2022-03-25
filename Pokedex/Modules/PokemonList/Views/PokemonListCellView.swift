@@ -7,8 +7,9 @@
 
 import Foundation
 import SwiftUI
+import Kingfisher
 
-struct PokemonListItemView: View {
+struct PokemonListCellView: View {
     let item: PokemonListItem
     
     var body: some View {
@@ -20,20 +21,12 @@ struct PokemonListItemView: View {
                 .padding(.trailing, 24)
                 //.frame(height: 80)
             HStack {
-                AsyncImage(url: URL(string: item.defaultFrontalSprite)) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                    case .success(let image):
-                        image.resizable()
-                            .scaledToFit()
-                            .frame(width: 80, height: 80)
-                    case .failure:
-                        Image(systemName: "photo")
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
+                KFImage(URL(string: item.defaultFrontalSprite))
+                        .interpolation(.none)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+               
                 VStack(alignment: .leading) {
                     Text((item.name?.capitalizingFirstLetter()) ?? item.name)
                         .font(Font.custom("SF Pro Text", size: 17))
@@ -46,7 +39,6 @@ struct PokemonListItemView: View {
                 }
             }
         }
-        
         .overlay( NavigationLink(destination: PokemonDetailView(id: item.id), label: {
             EmptyView()
         }))

@@ -12,16 +12,23 @@ struct PokemonListView: View {
     
     var body: some View {
         NavigationView {
-            List(listViewModel.pokemonsFiltered) { item in
-                //NavigationLink(destination: EmptyView()) {
-                    PokemonListItemView(item: item)
-                    .frame(height: 80)
-                //}
-                .listRowBackground(Color(UIColor.systemGray6))
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+            ZStack {
+                List(listViewModel.pokemonsFiltered) { item in
+                    //NavigationLink(destination: EmptyView()) {
+                        PokemonListCellView(item: item)
+                        .frame(height: 80)
+                    //}
+                    .listRowBackground(Color(UIColor.systemGray6))
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                }
+                .navigationTitle("Pokémon List")
+                
+                ProgressView( "Loading...")
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .opacity(listViewModel.isLoading ? 1 : 0)
             }
-            .navigationTitle("Pokémon List")
+            
         }
         .searchable(
             text: $listViewModel.textToSearch,

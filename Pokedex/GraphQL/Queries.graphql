@@ -1,5 +1,5 @@
-query AllPokemon($limit: Int) {
-  allPokemon(limit: $limit) {
+query AllPokemon {
+  allPokemon {
     id
     name
     types {

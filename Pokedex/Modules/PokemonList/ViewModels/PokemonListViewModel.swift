@@ -11,6 +11,8 @@ import Apollo
 class PokemonListViewModel: ObservableObject {
     @Published var pokemonList: [PokemonListItem] = [PokemonListItem]()
     @Published var textToSearch: String = ""
+    @Published var isLoading = false
+
     var pokemonsFiltered: [PokemonListItem] {
         return textToSearch == "" ? pokemonList : pokemonList.filter{ $0.name.lowercased().contains(textToSearch.lowercased())}
     }
@@ -22,7 +24,7 @@ class PokemonListViewModel: ObservableObject {
     
     func getallPokemons() {
         //let allPokemons =
-        Network.shared.apollo.fetch(query: AllPokemonQuery(limit: 10)) { [weak self] result in
+        Network.shared.apollo.fetch(query: AllPokemonQuery()) { [weak self] result in
             switch result {
             case .failure(let error):
                 print("Something bad happened \(error)")
@@ -43,8 +45,6 @@ class PokemonListViewModel: ObservableObject {
                     
                 }
             }
-        }
-        //var apollo = Network.shared.apollo
-        
+        }        
     }
 }

@@ -8,8 +8,8 @@ public final class AllPokemonQuery: GraphQLQuery {
   /// The raw GraphQL definition of this operation.
   public let operationDefinition: String =
     """
-    query AllPokemon($limit: Int) {
-      allPokemon(limit: $limit) {
+    query AllPokemon {
+      allPokemon {
         __typename
         id
         name
@@ -39,14 +39,7 @@ public final class AllPokemonQuery: GraphQLQuery {
 
   public let operationName: String = "AllPokemon"
 
-  public var limit: Int?
-
-  public init(limit: Int? = nil) {
-    self.limit = limit
-  }
-
-  public var variables: GraphQLMap? {
-    return ["limit": limit]
+  public init() {
   }
 
   public struct Data: GraphQLSelectionSet {
@@ -54,7 +47,7 @@ public final class AllPokemonQuery: GraphQLQuery {
 
     public static var selections: [GraphQLSelection] {
       return [
-        GraphQLField("allPokemon", arguments: ["limit": GraphQLVariable("limit")], type: .list(.object(AllPokemon.selections))),
+        GraphQLField("allPokemon", type: .list(.object(AllPokemon.selections))),
       ]
     }
 
