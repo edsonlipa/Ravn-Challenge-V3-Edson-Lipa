@@ -33,10 +33,15 @@ struct PokemonSpeciesResponse: Codable, Identifiable {
         let version: Version
     }
     
+    struct Generation: Codable {
+        let name: String
+    }
+    
     let id: Int
     let name: String
     let isLegendary: Bool
     let color: Color
+    let generation: Generation
     let evolutionChain: EvolutionChain
     let flavorTextEntries: [FlavorTextEntry]
 }

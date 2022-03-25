@@ -10,8 +10,10 @@ import Combine
 import SwiftUI
 
 protocol PokeApiServiceType {
-    func fetchPokemonSpecies(id: Int) -> AnyPublisher<PokemonSpeciesResponse, Error>
     func execute(for url: URL) -> AnyPublisher<Data, Error>
+    func fetchPokemonSpecies(id: Int) -> AnyPublisher<PokemonSpeciesResponse, Error>
+    func fetchPokemon(id: Int) -> AnyPublisher<PokemonResponse, Error>
+
 }
 
 struct PokeApiService: PokeApiServiceType {

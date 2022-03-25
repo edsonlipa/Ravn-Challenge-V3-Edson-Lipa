@@ -12,7 +12,7 @@ struct PokedexApp: App {
     var body: some Scene {
         WindowGroup {
 //            PokemonListView()
-            PokemonDetailView(id: 7)
+            PokemonDetailView(id: 413)
         }
     }
 }
