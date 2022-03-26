@@ -8,10 +8,10 @@
 import Foundation
 struct PokemonListItem: Identifiable {
     var id: Int
-    var defaultFrontalSprite: String!
-    var name: String!
-    var types: [String]!
-    var classification: String!
+    var defaultFrontalSprite: String
+    var name: String
+    var types: [String]
+    var classification: String
 }
 
 struct PokemonType: Identifiable {

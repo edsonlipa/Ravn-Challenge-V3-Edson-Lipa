@@ -25,7 +25,12 @@ class PokemonListViewModel: ObservableObject {
     private let service: GraphQLPokemonApiServiceType
     
     var pokemonsFiltered: [PokemonListItem] {
-        return textToSearch == "" ? pokemonList : pokemonList.filter{ $0.name.lowercased().contains(textToSearch.lowercased())}
+        textToSearch.isEmpty
+        ? pokemonList
+        : pokemonList.filter{
+            $0.name.lowercased().contains(
+                textToSearch.lowercased()
+            )}
     }
     
     var pokemonsGrouped: [String: [PokemonListItem]] {
@@ -34,14 +39,17 @@ class PokemonListViewModel: ObservableObject {
         }
     }
     
+    var pokemonClassifications: [String] {
+        pokemonsGrouped.keys.sorted(by: <).map { String($0) }
+    }
+    
     init(service: GraphQLPokemonApiServiceType = GraphQLPokemonApiService()) {
-//        pokemonList = [PokemonListItem(id: 1, defaultFrontalSprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", name: "pokemon name", types: "water")]
         self.service = service
-        getallPokemons()
+        setAllPokemonsSuscription()
         getPokemonRequest.send()
     }
     
-    func getallPokemons() {
+    func setAllPokemonsSuscription() {
         let result = getPokemonRequest
             .handleEvents(receiveOutput: { [weak self] _ in
                 self?.isLoading = true
@@ -75,10 +83,10 @@ class PokemonListViewModel: ObservableObject {
                   
                     return PokemonListItem(
                         id: Int(pokemon.number ?? "-1") ?? -1,
-                        defaultFrontalSprite: pokemon.image,
-                        name: pokemon.name,
-                        types: pokemon.types?.filter{ $0 != nil }.map{ $0! },
-                        classification: pokemon.classification
+                        defaultFrontalSprite: pokemon.image ?? "Pokeball",
+                        name: pokemon.name ?? "Pokemon Name",
+                        types: pokemon.types?.filter{ $0 != nil }.map{ $0! } ?? ["Type"],
+                        classification: pokemon.classification ?? "Classification"
                     )
                 }
             }

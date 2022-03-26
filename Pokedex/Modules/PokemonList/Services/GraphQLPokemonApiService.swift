@@ -35,7 +35,7 @@ struct GraphQLPokemonApiService: GraphQLPokemonApiServiceType {
     // MARK: - Implementation
     func fetchPokemons() -> AnyPublisher<Array<Pokemon>, Error> {
                 
-        self.execute(for: PokemonsQuery(first: 200))
+        self.execute(for: PokemonsQuery(first: 850))
             .compactMap { $0.pokemons?.compactMap { $0 } }
             .eraseToAnyPublisher()
     }

@@ -12,10 +12,6 @@ struct PokemonDetailView: View {
     var id: Int
     @ObservedObject var detailViewModel = PokemonDetailViewModel()
     
-//    private let barTitle = "pokemonDetail.bar.title".localized()
-//    private let defaultText = "pokemonDetail.defaultSprite.text".localized()
-//    private let shinyText = "pokemonDetail.shinySprite.text".localized()
-    
     var body: some View {
         ZStack {
             detailBodyView()

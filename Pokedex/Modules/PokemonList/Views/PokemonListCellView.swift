@@ -12,20 +12,6 @@ import Kingfisher
 struct PokemonListCellView: View {
     let item: PokemonListItem
     
-//    private func sectionHeader(title: String) -> some View {
-//        VStack(alignment: .leading, spacing: .zero) {
-//            Text(title)
-//                .font(.title3)
-//                .padding(.top, 10)
-//
-//            Rectangle()
-//                .fill(color)
-//                .frame(height: width)
-//                .edgesIgnoringSafeArea(.horizontal)
-//        }
-//        //.customRowStyle()
-//    }
-    
     var body: some View {
         ZStack(alignment: .leading) {
             Rectangle()
@@ -47,7 +33,7 @@ struct PokemonListCellView: View {
                         .frame(width: 80, height: 80)
                
                 VStack(alignment: .leading) {
-                    Text((item.name?.capitalizingFirstLetter()) ?? item.name)
+                    Text((item.name.capitalizingFirstLetter()) )
                         .font(Font.custom("SF Pro Text", size: 17))
                     Text(String(format: "#%03d", item.id))
                 }
@@ -55,8 +41,10 @@ struct PokemonListCellView: View {
                 HStack {
                     ForEach(item.types) { name in
                         Image("Types/\(name)")
+                            .padding(.all, 0)
                     }
                 }
+                .padding(.trailing, 5)
                 
             }
         }

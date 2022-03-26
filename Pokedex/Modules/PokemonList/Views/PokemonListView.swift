@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 15.0, *)
 struct PokemonListView: View {
     @ObservedObject var listViewModel = PokemonListViewModel()
 
@@ -14,14 +15,20 @@ struct PokemonListView: View {
         NavigationView {
             ZStack {
                 List {
-                    ForEach(listViewModel.pokemonsFiltered) { item in
-                        PokemonListCellView(item: item)
-                            .frame(height: 80)
-                            .listRowBackground(Color(UIColor.systemGray6))
-                            .listRowSeparator(.hidden)
-                            .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                    ForEach(listViewModel.pokemonClassifications, id: \.id) { classification in
+                        Section(content: {
+                            ForEach(listViewModel.pokemonsGrouped[classification]
+                                    ?? [PokemonListItem](), id: \.id) { item in
+                                PokemonListCellView(item: item)
+                                    .frame(height: 80)
+                                    .listRowBackground(Color(UIColor.systemGray6))
+                                    .listRowSeparator(.hidden)
+                                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                            }
+                        }, header: {
+                            Text(classification)
+                        })
                     }
-                    
                 }
                 .navigationTitle("Pokémon List")
                 .opacity(listViewModel.showAlert ? 0 : 1)
