@@ -16,6 +16,33 @@ struct PokemonDetailView: View {
 //    private let defaultText = "pokemonDetail.defaultSprite.text".localized()
 //    private let shinyText = "pokemonDetail.shinySprite.text".localized()
     
+    var body: some View {
+        ZStack {
+            detailBodyView()
+                .opacity(detailViewModel.isLoading || detailViewModel.showErrorMessage ? 0 : 1)
+            
+            ProgressView( "Loading...")
+            .frame(minWidth: 0, maxWidth: .infinity)
+            .opacity(detailViewModel.isLoading ? 1 : 0)
+            
+            erroTextView()
+                .opacity(detailViewModel.showErrorMessage ? 1 : 0)
+        }
+        .onAppear{
+            detailViewModel.getPokemon(id: id)
+        }
+        .alert(
+            isPresented: $detailViewModel.showAlert
+        ) {
+            Alert(
+                title: Text("There was an Error"),
+                message: Text("Failed to Load Data")
+            )
+        }
+        .navigationTitle("Pokemon Info")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
     private func PokemonDetailHeader() -> some View {
         ZStack {
             Rectangle()
@@ -23,6 +50,11 @@ struct PokemonDetailView: View {
             
             VStack {
                 KFImage(URL(string: detailViewModel.sprite))
+                    .placeholder{
+                        Image("Pokeball Grey")
+                            .resizable()
+                            
+                    }
                     .resizable()
                     .frame(width: 158.4, height: 158.4)
                     .padding(.vertical, 4)
@@ -80,28 +112,24 @@ struct PokemonDetailView: View {
         .offset(x: 0, y: -24)
     }
     
-    var body: some View {
+    private func detailBodyView() -> some View {
         VStack{
             PokemonDetailHeader()
             PokemonDetailInformation()
-            //data section
-                //id name
-                //types
-                //generation
-                //description
-            //evolution section
-                //evolution cell
+
         }
-//        Text("hello \(detailViewModel.pokemonModel.id)")
-        .navigationTitle("Pokemon Info")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear{
-            detailViewModel.getPokemon(id: id)
+    }
+
+    func erroTextView() -> some View {
+        VStack {
+            Text("Failed to Load Data")
+                .frame(alignment: .top)
+                .foregroundColor(.red)
+            
+            Spacer()
         }
     }
 }
-
-
 
 struct PokemonDetailView_Previews: PreviewProvider {
     static var previews: some View {

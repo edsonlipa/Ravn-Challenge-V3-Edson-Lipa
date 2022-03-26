@@ -12,6 +12,20 @@ import Kingfisher
 struct PokemonListCellView: View {
     let item: PokemonListItem
     
+//    private func sectionHeader(title: String) -> some View {
+//        VStack(alignment: .leading, spacing: .zero) {
+//            Text(title)
+//                .font(.title3)
+//                .padding(.top, 10)
+//
+//            Rectangle()
+//                .fill(color)
+//                .frame(height: width)
+//                .edgesIgnoringSafeArea(.horizontal)
+//        }
+//        //.customRowStyle()
+//    }
+    
     var body: some View {
         ZStack(alignment: .leading) {
             Rectangle()
@@ -22,6 +36,11 @@ struct PokemonListCellView: View {
                 //.frame(height: 80)
             HStack {
                 KFImage(URL(string: item.defaultFrontalSprite))
+                        .placeholder{
+                            Image("Pokeball Grey")
+                                .resizable()
+                                .scaledToFit()
+                        }
                         .interpolation(.none)
                         .resizable()
                         .scaledToFit()
@@ -32,15 +51,23 @@ struct PokemonListCellView: View {
                         .font(Font.custom("SF Pro Text", size: 17))
                     Text(String(format: "#%03d", item.id))
                 }
+                Spacer()
                 HStack {
-                    ForEach(item.types) { type in
-                        Text(type.name)
+                    ForEach(item.types) { name in
+                        Image("Types/\(name)")
                     }
                 }
+                
             }
         }
         .overlay( NavigationLink(destination: PokemonDetailView(id: item.id), label: {
             EmptyView()
         }))
+    }
+}
+
+struct PokemonListCellView_Previews: PreviewProvider {
+    static var previews: some View {
+        PokemonListCellView(item: PokemonListItem(id: 0, defaultFrontalSprite: "image", name: "name", types: ["Water"], classification: "algo"))
     }
 }

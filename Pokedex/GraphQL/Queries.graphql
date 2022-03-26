@@ -1,24 +1,23 @@
-query AllPokemon {
-  allPokemon {
+query pokemons($first: Int!){
+  pokemons(first: $first){
     id
+    number
     name
-    types {
-      name
-      id
-      
+    weight{
+      minimum
+      maximum
     }
-    sprites {
-      front_default
-      front_shiny
+    height{
+      minimum
+      maximum
     }
-    generation
-    dominant_color {
-      light
-      dark
-      original
-      r
-      g
-      b
-    }
+    classification
+    types
+    resistant
+    weaknesses
+    fleeRate
+    maxCP
+    maxHP
+    image
   }
 }

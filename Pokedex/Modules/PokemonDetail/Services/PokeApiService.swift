@@ -19,6 +19,7 @@ protocol PokeApiServiceType {
 struct PokeApiService: PokeApiServiceType {
     
     let baseURL = "https://pokeapi.co/api/v2"
+//    let baseURL = "https://pokeapi.co/api"
     let decoder: JSONDecoder
     let session: URLSession
 

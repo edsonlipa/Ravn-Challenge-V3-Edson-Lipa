@@ -11,16 +11,24 @@ import Combine
 class PokemonDetailViewModel: ObservableObject {
     @Published var id: Int = 0
     @Published var pokemonModel: PokemonDetail
-    @Published var isLoading = false
     @Published var spriteIndex = 0
+    @Published var showAlert = false
+    @Published var showErrorMessage = false
 
     private var cancellables = Set<AnyCancellable>()
     private let service: PokeApiServiceType
+    private var isSpeciesLoading = false
+    private var isPokemonLoading = false
+    private var isEvolutionLoading = false
 
     let getPokemonSpeciesRequest = PassthroughSubject<Void, Never>()
     let getPokemonRequest = PassthroughSubject<Void, Never>()
 
     let didThrowError = PassthroughSubject<Void, Never>()
+    
+    var isLoading: Bool {
+        isSpeciesLoading || isPokemonLoading
+    }
     
     var sprite: String {
         return spriteIndex == 0 ? pokemonModel.defaultSprite : pokemonModel.shinySprite
@@ -50,13 +58,12 @@ class PokemonDetailViewModel: ObservableObject {
     func getPokemon(id: Int) {
         self.id = id
         self.getPokemonSpeciesRequest.send()
-        self.getPokemonRequest.send()
     }
     
     private func setPokemonSpeciesSubscriptions() {
         let result = getPokemonSpeciesRequest
             .handleEvents(receiveOutput: { [weak self] _ in
-                self?.isLoading = true
+                self?.isSpeciesLoading = true
             })
             .map { [service, weak self] _ -> AnyPublisher<Result<PokemonSpeciesResponse, Error>, Never> in
                 service.fetchPokemonSpecies(id: self?.id ?? 0)
@@ -67,7 +74,7 @@ class PokemonDetailViewModel: ObservableObject {
             .switchToLatest()
             .receive(on: DispatchQueue.main)
             .handleEvents(receiveOutput: { [weak self] _ in
-                self?.isLoading = false
+                self?.isSpeciesLoading = false
             })
             .share()
         
@@ -85,28 +92,27 @@ class PokemonDetailViewModel: ObservableObject {
             .sink { [weak self] response in
 
 //                let evolutionChain: EvolutionChain
-                
+//                self?.isLoading = false
+                self?.getPokemonRequest.send()
+
                 self?.pokemonModel.id = response.id
                 self?.pokemonModel.generation = response.generation.name.capitalized
-//                let test = String(text.filter { !" \n\t\r".contains($0) })
                 self?.pokemonModel.description = response.flavorTextEntries[0].flavorText
-//                if let flavor =
                 if let textEntry=response.flavorTextEntries.first(where: {$0.language.name == "en"}){
                     let flavorText = textEntry.flavorText.filter{!"\n".contains($0)}
                     self?.pokemonModel.description = flavorText
                 }
-                    
                 self?.pokemonModel.backgroundColor = response.color.name
                 self?.pokemonModel.isLegendary = response.isLegendary
-                //add description
+                
             }
             .store(in: &cancellables)
 
         result
             .filter { !$0.isSuccessful }
             .sink { [weak self] error in
-                print("error")
-                self?.didThrowError.send()
+                self?.showAlert = true
+                self?.showErrorMessage = true
             }
             .store(in: &cancellables)
     }
@@ -114,7 +120,7 @@ class PokemonDetailViewModel: ObservableObject {
     private func setPokemonSubscriptions() {
         let result = getPokemonRequest
             .handleEvents(receiveOutput: { [weak self] _ in
-                self?.isLoading = true
+                self?.isPokemonLoading = true
             })
             .map { [service, weak self] _ -> AnyPublisher<Result<PokemonResponse, Error>, Never> in
                 service.fetchPokemon(id: self?.id ?? 0)
@@ -125,7 +131,7 @@ class PokemonDetailViewModel: ObservableObject {
             .switchToLatest()
             .receive(on: DispatchQueue.main)
             .handleEvents(receiveOutput: { [weak self] _ in
-                self?.isLoading = false
+                self?.isPokemonLoading = false
             })
             .share()
         
@@ -140,7 +146,7 @@ class PokemonDetailViewModel: ObservableObject {
                 }
             }
             .sink { [weak self] response in
-//                print(response.types)
+
                 self?.pokemonModel.id = response.id
                 self?.pokemonModel.name = response.name
                 self?.pokemonModel.defaultSprite = response.sprites.frontDefault
@@ -156,8 +162,8 @@ class PokemonDetailViewModel: ObservableObject {
         result
             .filter { !$0.isSuccessful }
             .sink { [weak self] error in
-                print("error")
-                self?.didThrowError.send()
+                self?.showAlert = true
+                self?.showErrorMessage = true
             }
             .store(in: &cancellables)
     }

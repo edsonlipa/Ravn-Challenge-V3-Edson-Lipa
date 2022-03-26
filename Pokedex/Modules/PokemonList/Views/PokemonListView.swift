@@ -9,30 +9,52 @@ import SwiftUI
 
 struct PokemonListView: View {
     @ObservedObject var listViewModel = PokemonListViewModel()
-    
+
     var body: some View {
         NavigationView {
             ZStack {
-                List(listViewModel.pokemonsFiltered) { item in
-                    //NavigationLink(destination: EmptyView()) {
+                List {
+                    ForEach(listViewModel.pokemonsFiltered) { item in
                         PokemonListCellView(item: item)
-                        .frame(height: 80)
-                    //}
-                    .listRowBackground(Color(UIColor.systemGray6))
-                    .listRowSeparator(.hidden)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                            .frame(height: 80)
+                            .listRowBackground(Color(UIColor.systemGray6))
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                    }
+                    
                 }
                 .navigationTitle("Pokémon List")
+                .opacity(listViewModel.showAlert ? 0 : 1)
                 
+                erroTextView()
+                    .opacity(listViewModel.showErrorMessage ? 1 : 0)
+
                 ProgressView( "Loading...")
                 .frame(minWidth: 0, maxWidth: .infinity)
                 .opacity(listViewModel.isLoading ? 1 : 0)
             }
             
         }
+        .alert(isPresented: $listViewModel.showAlert) {
+            Alert(
+                title: Text("There was an Error"),
+                message: Text("Failed to Load Data")
+            )
+        }
         .searchable(
             text: $listViewModel.textToSearch,
             placement: .navigationBarDrawer(displayMode: .always))
+        
+    }
+    
+    func erroTextView() -> some View {
+        VStack {
+            Text("Failed to Load Data")
+                .frame(alignment: .top)
+                .foregroundColor(.red)
+            
+            Spacer()
+        }
     }
 }
 

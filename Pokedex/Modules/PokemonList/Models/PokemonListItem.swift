@@ -10,7 +10,8 @@ struct PokemonListItem: Identifiable {
     var id: Int
     var defaultFrontalSprite: String!
     var name: String!
-    var types: [PokemonType]!
+    var types: [String]!
+    var classification: String!
 }
 
 struct PokemonType: Identifiable {

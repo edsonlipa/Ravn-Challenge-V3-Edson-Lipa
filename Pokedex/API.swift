@@ -4,42 +4,48 @@
 import Apollo
 import Foundation
 
-public final class AllPokemonQuery: GraphQLQuery {
+public final class PokemonsQuery: GraphQLQuery {
   /// The raw GraphQL definition of this operation.
   public let operationDefinition: String =
     """
-    query AllPokemon {
-      allPokemon {
+    query pokemons($first: Int!) {
+      pokemons(first: $first) {
         __typename
         id
+        number
         name
-        types {
+        weight {
           __typename
-          name
-          id
+          minimum
+          maximum
         }
-        sprites {
+        height {
           __typename
-          front_default
-          front_shiny
+          minimum
+          maximum
         }
-        generation
-        dominant_color {
-          __typename
-          light
-          dark
-          original
-          r
-          g
-          b
-        }
+        classification
+        types
+        resistant
+        weaknesses
+        fleeRate
+        maxCP
+        maxHP
+        image
       }
     }
     """
 
-  public let operationName: String = "AllPokemon"
+  public let operationName: String = "pokemons"
 
-  public init() {
+  public var first: Int
+
+  public init(first: Int) {
+    self.first = first
+  }
+
+  public var variables: GraphQLMap? {
+    return ["first": first]
   }
 
   public struct Data: GraphQLSelectionSet {
@@ -47,7 +53,7 @@ public final class AllPokemonQuery: GraphQLQuery {
 
     public static var selections: [GraphQLSelection] {
       return [
-        GraphQLField("allPokemon", type: .list(.object(AllPokemon.selections))),
+        GraphQLField("pokemons", arguments: ["first": GraphQLVariable("first")], type: .list(.object(Pokemon.selections))),
       ]
     }
 
@@ -57,32 +63,38 @@ public final class AllPokemonQuery: GraphQLQuery {
       self.resultMap = unsafeResultMap
     }
 
-    public init(allPokemon: [AllPokemon?]? = nil) {
-      self.init(unsafeResultMap: ["__typename": "Query", "allPokemon": allPokemon.flatMap { (value: [AllPokemon?]) -> [ResultMap?] in value.map { (value: AllPokemon?) -> ResultMap? in value.flatMap { (value: AllPokemon) -> ResultMap in value.resultMap } } }])
+    public init(pokemons: [Pokemon?]? = nil) {
+      self.init(unsafeResultMap: ["__typename": "Query", "pokemons": pokemons.flatMap { (value: [Pokemon?]) -> [ResultMap?] in value.map { (value: Pokemon?) -> ResultMap? in value.flatMap { (value: Pokemon) -> ResultMap in value.resultMap } } }])
     }
 
-    /// get range of Pokemon starting from start variable
-    public var allPokemon: [AllPokemon?]? {
+    public var pokemons: [Pokemon?]? {
       get {
-        return (resultMap["allPokemon"] as? [ResultMap?]).flatMap { (value: [ResultMap?]) -> [AllPokemon?] in value.map { (value: ResultMap?) -> AllPokemon? in value.flatMap { (value: ResultMap) -> AllPokemon in AllPokemon(unsafeResultMap: value) } } }
+        return (resultMap["pokemons"] as? [ResultMap?]).flatMap { (value: [ResultMap?]) -> [Pokemon?] in value.map { (value: ResultMap?) -> Pokemon? in value.flatMap { (value: ResultMap) -> Pokemon in Pokemon(unsafeResultMap: value) } } }
       }
       set {
-        resultMap.updateValue(newValue.flatMap { (value: [AllPokemon?]) -> [ResultMap?] in value.map { (value: AllPokemon?) -> ResultMap? in value.flatMap { (value: AllPokemon) -> ResultMap in value.resultMap } } }, forKey: "allPokemon")
+        resultMap.updateValue(newValue.flatMap { (value: [Pokemon?]) -> [ResultMap?] in value.map { (value: Pokemon?) -> ResultMap? in value.flatMap { (value: Pokemon) -> ResultMap in value.resultMap } } }, forKey: "pokemons")
       }
     }
 
-    public struct AllPokemon: GraphQLSelectionSet {
+    public struct Pokemon: GraphQLSelectionSet {
       public static let possibleTypes: [String] = ["Pokemon"]
 
       public static var selections: [GraphQLSelection] {
         return [
           GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
-          GraphQLField("id", type: .scalar(Int.self)),
+          GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
+          GraphQLField("number", type: .scalar(String.self)),
           GraphQLField("name", type: .scalar(String.self)),
-          GraphQLField("types", type: .list(.object(`Type`.selections))),
-          GraphQLField("sprites", type: .object(Sprite.selections)),
-          GraphQLField("generation", type: .scalar(String.self)),
-          GraphQLField("dominant_color", type: .object(DominantColor.selections)),
+          GraphQLField("weight", type: .object(Weight.selections)),
+          GraphQLField("height", type: .object(Height.selections)),
+          GraphQLField("classification", type: .scalar(String.self)),
+          GraphQLField("types", type: .list(.scalar(String.self))),
+          GraphQLField("resistant", type: .list(.scalar(String.self))),
+          GraphQLField("weaknesses", type: .list(.scalar(String.self))),
+          GraphQLField("fleeRate", type: .scalar(Double.self)),
+          GraphQLField("maxCP", type: .scalar(Int.self)),
+          GraphQLField("maxHP", type: .scalar(Int.self)),
+          GraphQLField("image", type: .scalar(String.self)),
         ]
       }
 
@@ -92,8 +104,8 @@ public final class AllPokemonQuery: GraphQLQuery {
         self.resultMap = unsafeResultMap
       }
 
-      public init(id: Int? = nil, name: String? = nil, types: [`Type`?]? = nil, sprites: Sprite? = nil, generation: String? = nil, dominantColor: DominantColor? = nil) {
-        self.init(unsafeResultMap: ["__typename": "Pokemon", "id": id, "name": name, "types": types.flatMap { (value: [`Type`?]) -> [ResultMap?] in value.map { (value: `Type`?) -> ResultMap? in value.flatMap { (value: `Type`) -> ResultMap in value.resultMap } } }, "sprites": sprites.flatMap { (value: Sprite) -> ResultMap in value.resultMap }, "generation": generation, "dominant_color": dominantColor.flatMap { (value: DominantColor) -> ResultMap in value.resultMap }])
+      public init(id: GraphQLID, number: String? = nil, name: String? = nil, weight: Weight? = nil, height: Height? = nil, classification: String? = nil, types: [String?]? = nil, resistant: [String?]? = nil, weaknesses: [String?]? = nil, fleeRate: Double? = nil, maxCp: Int? = nil, maxHp: Int? = nil, image: String? = nil) {
+        self.init(unsafeResultMap: ["__typename": "Pokemon", "id": id, "number": number, "name": name, "weight": weight.flatMap { (value: Weight) -> ResultMap in value.resultMap }, "height": height.flatMap { (value: Height) -> ResultMap in value.resultMap }, "classification": classification, "types": types, "resistant": resistant, "weaknesses": weaknesses, "fleeRate": fleeRate, "maxCP": maxCp, "maxHP": maxHp, "image": image])
       }
 
       public var __typename: String {
@@ -105,15 +117,27 @@ public final class AllPokemonQuery: GraphQLQuery {
         }
       }
 
-      public var id: Int? {
+      /// The ID of an object
+      public var id: GraphQLID {
         get {
-          return resultMap["id"] as? Int
+          return resultMap["id"]! as! GraphQLID
         }
         set {
           resultMap.updateValue(newValue, forKey: "id")
         }
       }
 
+      /// The identifier of this Pokémon
+      public var number: String? {
+        get {
+          return resultMap["number"] as? String
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "number")
+        }
+      }
+
+      /// The name of this Pokémon
       public var name: String? {
         get {
           return resultMap["name"] as? String
@@ -123,54 +147,112 @@ public final class AllPokemonQuery: GraphQLQuery {
         }
       }
 
-      /// array of all the different Types of the queried Pokemon
-      public var types: [`Type`?]? {
+      /// The minimum and maximum weight of this Pokémon
+      public var weight: Weight? {
         get {
-          return (resultMap["types"] as? [ResultMap?]).flatMap { (value: [ResultMap?]) -> [`Type`?] in value.map { (value: ResultMap?) -> `Type`? in value.flatMap { (value: ResultMap) -> `Type` in `Type`(unsafeResultMap: value) } } }
+          return (resultMap["weight"] as? ResultMap).flatMap { Weight(unsafeResultMap: $0) }
         }
         set {
-          resultMap.updateValue(newValue.flatMap { (value: [`Type`?]) -> [ResultMap?] in value.map { (value: `Type`?) -> ResultMap? in value.flatMap { (value: `Type`) -> ResultMap in value.resultMap } } }, forKey: "types")
+          resultMap.updateValue(newValue?.resultMap, forKey: "weight")
         }
       }
 
-      /// array of Sprite objects
-      public var sprites: Sprite? {
+      /// The minimum and maximum weight of this Pokémon
+      public var height: Height? {
         get {
-          return (resultMap["sprites"] as? ResultMap).flatMap { Sprite(unsafeResultMap: $0) }
+          return (resultMap["height"] as? ResultMap).flatMap { Height(unsafeResultMap: $0) }
         }
         set {
-          resultMap.updateValue(newValue?.resultMap, forKey: "sprites")
+          resultMap.updateValue(newValue?.resultMap, forKey: "height")
         }
       }
 
-      /// which generation the queried Pokemon debuted in
-      public var generation: String? {
+      /// The classification of this Pokémon
+      public var classification: String? {
         get {
-          return resultMap["generation"] as? String
+          return resultMap["classification"] as? String
         }
         set {
-          resultMap.updateValue(newValue, forKey: "generation")
+          resultMap.updateValue(newValue, forKey: "classification")
         }
       }
 
-      /// dominant color of the queried Pokemon's image
-      public var dominantColor: DominantColor? {
+      /// The type(s) of this Pokémon
+      public var types: [String?]? {
         get {
-          return (resultMap["dominant_color"] as? ResultMap).flatMap { DominantColor(unsafeResultMap: $0) }
+          return resultMap["types"] as? [String?]
         }
         set {
-          resultMap.updateValue(newValue?.resultMap, forKey: "dominant_color")
+          resultMap.updateValue(newValue, forKey: "types")
         }
       }
 
-      public struct `Type`: GraphQLSelectionSet {
-        public static let possibleTypes: [String] = ["Type"]
+      /// The type(s) of Pokémons that this Pokémon is resistant to
+      public var resistant: [String?]? {
+        get {
+          return resultMap["resistant"] as? [String?]
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "resistant")
+        }
+      }
+
+      /// The type(s) of Pokémons that this Pokémon weak to
+      public var weaknesses: [String?]? {
+        get {
+          return resultMap["weaknesses"] as? [String?]
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "weaknesses")
+        }
+      }
+
+      public var fleeRate: Double? {
+        get {
+          return resultMap["fleeRate"] as? Double
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "fleeRate")
+        }
+      }
+
+      /// The maximum CP of this Pokémon
+      public var maxCp: Int? {
+        get {
+          return resultMap["maxCP"] as? Int
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "maxCP")
+        }
+      }
+
+      /// The maximum HP of this Pokémon
+      public var maxHp: Int? {
+        get {
+          return resultMap["maxHP"] as? Int
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "maxHP")
+        }
+      }
+
+      public var image: String? {
+        get {
+          return resultMap["image"] as? String
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "image")
+        }
+      }
+
+      public struct Weight: GraphQLSelectionSet {
+        public static let possibleTypes: [String] = ["PokemonDimension"]
 
         public static var selections: [GraphQLSelection] {
           return [
             GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
-            GraphQLField("name", type: .scalar(String.self)),
-            GraphQLField("id", type: .scalar(Int.self)),
+            GraphQLField("minimum", type: .scalar(String.self)),
+            GraphQLField("maximum", type: .scalar(String.self)),
           ]
         }
 
@@ -180,8 +262,8 @@ public final class AllPokemonQuery: GraphQLQuery {
           self.resultMap = unsafeResultMap
         }
 
-        public init(name: String? = nil, id: Int? = nil) {
-          self.init(unsafeResultMap: ["__typename": "Type", "name": name, "id": id])
+        public init(minimum: String? = nil, maximum: String? = nil) {
+          self.init(unsafeResultMap: ["__typename": "PokemonDimension", "minimum": minimum, "maximum": maximum])
         }
 
         public var __typename: String {
@@ -193,33 +275,35 @@ public final class AllPokemonQuery: GraphQLQuery {
           }
         }
 
-        public var name: String? {
+        /// The minimum value of this dimension
+        public var minimum: String? {
           get {
-            return resultMap["name"] as? String
+            return resultMap["minimum"] as? String
           }
           set {
-            resultMap.updateValue(newValue, forKey: "name")
+            resultMap.updateValue(newValue, forKey: "minimum")
           }
         }
 
-        public var id: Int? {
+        /// The maximum value of this dimension
+        public var maximum: String? {
           get {
-            return resultMap["id"] as? Int
+            return resultMap["maximum"] as? String
           }
           set {
-            resultMap.updateValue(newValue, forKey: "id")
+            resultMap.updateValue(newValue, forKey: "maximum")
           }
         }
       }
 
-      public struct Sprite: GraphQLSelectionSet {
-        public static let possibleTypes: [String] = ["Sprites"]
+      public struct Height: GraphQLSelectionSet {
+        public static let possibleTypes: [String] = ["PokemonDimension"]
 
         public static var selections: [GraphQLSelection] {
           return [
             GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
-            GraphQLField("front_default", type: .scalar(String.self)),
-            GraphQLField("front_shiny", type: .scalar(String.self)),
+            GraphQLField("minimum", type: .scalar(String.self)),
+            GraphQLField("maximum", type: .scalar(String.self)),
           ]
         }
 
@@ -229,8 +313,8 @@ public final class AllPokemonQuery: GraphQLQuery {
           self.resultMap = unsafeResultMap
         }
 
-        public init(frontDefault: String? = nil, frontShiny: String? = nil) {
-          self.init(unsafeResultMap: ["__typename": "Sprites", "front_default": frontDefault, "front_shiny": frontShiny])
+        public init(minimum: String? = nil, maximum: String? = nil) {
+          self.init(unsafeResultMap: ["__typename": "PokemonDimension", "minimum": minimum, "maximum": maximum])
         }
 
         public var __typename: String {
@@ -242,110 +326,23 @@ public final class AllPokemonQuery: GraphQLQuery {
           }
         }
 
-        public var frontDefault: String? {
+        /// The minimum value of this dimension
+        public var minimum: String? {
           get {
-            return resultMap["front_default"] as? String
+            return resultMap["minimum"] as? String
           }
           set {
-            resultMap.updateValue(newValue, forKey: "front_default")
+            resultMap.updateValue(newValue, forKey: "minimum")
           }
         }
 
-        public var frontShiny: String? {
+        /// The maximum value of this dimension
+        public var maximum: String? {
           get {
-            return resultMap["front_shiny"] as? String
+            return resultMap["maximum"] as? String
           }
           set {
-            resultMap.updateValue(newValue, forKey: "front_shiny")
-          }
-        }
-      }
-
-      public struct DominantColor: GraphQLSelectionSet {
-        public static let possibleTypes: [String] = ["Dominant_Color"]
-
-        public static var selections: [GraphQLSelection] {
-          return [
-            GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
-            GraphQLField("light", type: .scalar(String.self)),
-            GraphQLField("dark", type: .scalar(String.self)),
-            GraphQLField("original", type: .scalar(String.self)),
-            GraphQLField("r", type: .scalar(Int.self)),
-            GraphQLField("g", type: .scalar(Int.self)),
-            GraphQLField("b", type: .scalar(Int.self)),
-          ]
-        }
-
-        public private(set) var resultMap: ResultMap
-
-        public init(unsafeResultMap: ResultMap) {
-          self.resultMap = unsafeResultMap
-        }
-
-        public init(light: String? = nil, dark: String? = nil, original: String? = nil, r: Int? = nil, g: Int? = nil, b: Int? = nil) {
-          self.init(unsafeResultMap: ["__typename": "Dominant_Color", "light": light, "dark": dark, "original": original, "r": r, "g": g, "b": b])
-        }
-
-        public var __typename: String {
-          get {
-            return resultMap["__typename"]! as! String
-          }
-          set {
-            resultMap.updateValue(newValue, forKey: "__typename")
-          }
-        }
-
-        public var light: String? {
-          get {
-            return resultMap["light"] as? String
-          }
-          set {
-            resultMap.updateValue(newValue, forKey: "light")
-          }
-        }
-
-        public var dark: String? {
-          get {
-            return resultMap["dark"] as? String
-          }
-          set {
-            resultMap.updateValue(newValue, forKey: "dark")
-          }
-        }
-
-        public var original: String? {
-          get {
-            return resultMap["original"] as? String
-          }
-          set {
-            resultMap.updateValue(newValue, forKey: "original")
-          }
-        }
-
-        public var r: Int? {
-          get {
-            return resultMap["r"] as? Int
-          }
-          set {
-            resultMap.updateValue(newValue, forKey: "r")
-          }
-        }
-
-        public var g: Int? {
-          get {
-            return resultMap["g"] as? Int
-          }
-          set {
-            resultMap.updateValue(newValue, forKey: "g")
-          }
-        }
-
-        public var b: Int? {
-          get {
-            return resultMap["b"] as? Int
-          }
-          set {
-            resultMap.updateValue(newValue, forKey: "b")
+            resultMap.updateValue(newValue, forKey: "maximum")
           }
         }
       }
