@@ -265,7 +265,6 @@ class PokemonDetailViewModel: ObservableObject {
                 }
             }
             .sink { [weak self] response in
-                print("pokemon added")
                 guard let self = self else {
                     return                }
                 let evolutionTo = PokemonEvolution(id: response.id, name: response.name, shape: response.sprites.frontDefault)

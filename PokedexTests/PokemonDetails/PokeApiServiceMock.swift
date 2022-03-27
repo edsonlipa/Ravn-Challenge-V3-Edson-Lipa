@@ -16,8 +16,10 @@ enum PokeApiMuckResult {
 }
 
 struct PokeApiServiceMock: PokeApiServiceType {
+    var ServiceSpeciesResult: PokeApiMuckResult = .success
+    var ServicePokemonResult: PokeApiMuckResult = .success
+    var ServiceEvolutionResult: PokeApiMuckResult = .success
 
-    var ServiceResult: PokeApiMuckResult = .success
     var pokemonSpeciesResponse = PokemonSpeciesResponse(
         id: 1,
         name: "pikachu",
@@ -40,7 +42,7 @@ struct PokeApiServiceMock: PokeApiServiceType {
         id: 1,
         name: "pikachu",
         sprites: PokemonResponse.Sprites(
-            frontDefault: "image 1",
+            frontDefault: "image1",
             frontShiny: "image2"),
         types: [PokemonResponse.TypesResponse(
             slot: 0,
@@ -52,18 +54,21 @@ struct PokeApiServiceMock: PokeApiServiceType {
     
     var pokemonEvolutionResponse = PokemonEvolutionResponse(
         chain: PokemonEvolutionResponse.ChainLink(
-            species: PokemonEvolutionResponse.Species(name: "pokemon name"),
-            evolvesTo: []),
+            species: PokemonEvolutionResponse.Species(name: "pikachu"),
+            evolvesTo: [PokemonEvolutionResponse.ChainLink(
+                species: PokemonEvolutionResponse.Species(name: "raichu"),
+                evolvesTo: [])
+                       ]),
         id: 1)
 
     
     func fetchPokemonSpecies(id: Int) -> AnyPublisher<PokemonSpeciesResponse, Error> {
-        return ServiceResult == .failure
+        return ServiceSpeciesResult == .failure
             ? Fail(error: NSError())
                 .eraseToAnyPublisher()
             : Just(pokemonSpeciesResponse)
                 .setFailureType(to: Error.self)
-                .delay(for: ServiceResult == .delayed
+                .delay(for: ServiceSpeciesResult == .delayed
                              ? .seconds(1)
                              : .milliseconds(1) ,
                             scheduler: DispatchQueue.main)
@@ -71,12 +76,12 @@ struct PokeApiServiceMock: PokeApiServiceType {
     }
     
     func fetchPokemon(id: Int) -> AnyPublisher<PokemonResponse, Error> {
-        return ServiceResult == .failure
+        return ServicePokemonResult == .failure
             ? Fail(error: NSError())
                 .eraseToAnyPublisher()
             : Just(pokemonResponse)
                 .setFailureType(to: Error.self)
-                .delay(for: ServiceResult == .delayed
+                .delay(for: ServicePokemonResult == .delayed
                              ? .seconds(1)
                              : .milliseconds(1) ,
                             scheduler: DispatchQueue.main)
@@ -84,12 +89,12 @@ struct PokeApiServiceMock: PokeApiServiceType {
     }
     
     func fetchPokemonEvolutions(stringURL: String) -> AnyPublisher<PokemonEvolutionResponse, Error> {
-        return ServiceResult == .failure
+        return ServiceEvolutionResult == .failure
             ? Fail(error: NSError())
                 .eraseToAnyPublisher()
             : Just(pokemonEvolutionResponse)
                 .setFailureType(to: Error.self)
-                .delay(for: ServiceResult == .delayed
+                .delay(for: ServiceEvolutionResult == .delayed
                              ? .seconds(1)
                              : .milliseconds(1) ,
                             scheduler: DispatchQueue.main)
@@ -97,12 +102,12 @@ struct PokeApiServiceMock: PokeApiServiceType {
     }
     
     func fetchPokemon(name: String) -> AnyPublisher<PokemonResponse, Error> {
-        return ServiceResult == .failure
+        return ServicePokemonResult == .failure
             ? Fail(error: NSError())
                 .eraseToAnyPublisher()
             : Just(pokemonResponse)
                 .setFailureType(to: Error.self)
-                .delay(for: ServiceResult == .delayed
+                .delay(for: ServicePokemonResult == .delayed
                              ? .seconds(1)
                              : .milliseconds(1) ,
                             scheduler: DispatchQueue.main)

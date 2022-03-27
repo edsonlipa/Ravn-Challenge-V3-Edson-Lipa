@@ -18,25 +18,68 @@ class DetailViewModelTest: XCTestCase {
         
         //When
         detailViewModel.getPokemon(id: 1)
-        let _ = XCTWaiter().wait(for: [XCTestExpectation()], timeout: 0.5)
+        let _ = XCTWaiter().wait(for: [XCTestExpectation()], timeout: 1.5)
 
         //Then
-        //XCTAssertFalse( listViewModel.pokemonModel.name == "Pokemon Name")
+        XCTAssertFalse( detailViewModel.isLoading)
+        XCTAssertEqual( detailViewModel.sprite, "image1")
+
         XCTAssertEqual( detailViewModel.pokemonModel.id , 1)
         XCTAssertEqual( detailViewModel.pokemonModel.name , "pikachu")
         XCTAssertEqual( detailViewModel.pokemonModel.isLegendary , true)
+        XCTAssertFalse( detailViewModel.evolutions.isEmpty)
+        XCTAssertFalse( detailViewModel.pokemonName == detailViewModel.pokemonModel.name)
+
+        //When
+        detailViewModel.spriteIndex = 1
+        //Then
+        XCTAssertEqual( detailViewModel.sprite, "image2")
 
     }
     
-    func testPokeApiServiceError() throws {
+    func testPokeApiServicePokemonError() throws {
         //Given
-        let service = PokeApiServiceMock(ServiceResult: .failure)
+        let service = PokeApiServiceMock(ServicePokemonResult: .failure)
         let detailViewModel = PokemonDetailViewModel(service: service)
         
         //When
         detailViewModel.getPokemon(id: 1)
-        
+        let _ = XCTWaiter().wait(for: [XCTestExpectation()], timeout: 1.5)
+
         //Then
+        XCTAssertTrue(detailViewModel.showErrorMessage)
+        XCTAssertTrue(detailViewModel.showAlert)
+
+    }
+    
+    func testPokeApiServiceSpeciesError() throws {
+        //Given
+        let service = PokeApiServiceMock(ServiceSpeciesResult: .failure)
+        let detailViewModel = PokemonDetailViewModel(service: service)
+        
+        //When
+        detailViewModel.getPokemon(id: 1)
+        let _ = XCTWaiter().wait(for: [XCTestExpectation()], timeout: 1.5)
+
+        //Then
+        XCTAssertTrue(detailViewModel.showErrorMessage)
+        XCTAssertTrue(detailViewModel.showAlert)
+
+    }
+    
+    func testPokeApiServiceEvolutionError() throws {
+        //Given
+        let service = PokeApiServiceMock(ServiceEvolutionResult: .failure)
+        let detailViewModel = PokemonDetailViewModel(service: service)
+        
+        //When
+        detailViewModel.getPokemon(id: 1)
+        let _ = XCTWaiter().wait(for: [XCTestExpectation()], timeout: 1.5)
+
+        //Then
+        XCTAssertTrue(detailViewModel.showErrorMessage)
+        XCTAssertTrue(detailViewModel.showAlert)
+
     }
 
 }
