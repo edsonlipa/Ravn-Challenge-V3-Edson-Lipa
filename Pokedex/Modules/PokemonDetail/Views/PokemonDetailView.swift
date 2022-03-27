@@ -41,6 +41,7 @@ struct PokemonDetailView: View {
     
     private func PokemonDetailHeader() -> some View {
         ZStack {
+            
             Rectangle()
                 .fill(Color(detailViewModel.pokemonModel.backgroundColor.capitalizingFirstLetter()))
             
@@ -49,7 +50,7 @@ struct PokemonDetailView: View {
                     .placeholder{
                         Image("Pokeball Grey")
                             .resizable()
-                            
+                            .frame(width: 50, height: 50)
                     }
                     .resizable()
                     .frame(width: 158.4, height: 158.4)
@@ -68,6 +69,18 @@ struct PokemonDetailView: View {
                 .pickerStyle(.segmented)
                 .padding(.horizontal, 16)
             }
+            HStack{
+                Spacer()
+                VStack{
+                    Image("Legendary icon")
+                        .padding(.top, 8)
+                        .padding(.trailing, 8)
+                    Spacer()
+                }
+            }
+            .opacity(detailViewModel.pokemonModel.isLegendary ? 1 : 0)
+            
+            
         }
         .frame(height: 256)
 
@@ -78,9 +91,7 @@ struct PokemonDetailView: View {
             Rectangle()
                 .fill(.white)
             VStack {
-                //Text(detailViewModel.pokemonModel.name)
                 Text(String(format: "#%03d \(detailViewModel.pokemonName)", id))
-//                    .padding(.top, 16.0)
                     .font(Font.system(size: 28))
                     .padding(EdgeInsets(top: 16, leading: 16, bottom: 0, trailing: 16))
                     
@@ -108,10 +119,45 @@ struct PokemonDetailView: View {
         .offset(x: 0, y: -24)
     }
     
+    private func evolutionView() -> some View {
+        ScrollView{
+            Text("Evolutions")
+            LazyVStack{
+                ForEach(detailViewModel.evolutions) { evolutionCell in
+                    HStack {
+                        HStack{
+                            KFImage(URL(string: evolutionCell.firt.shape)!)
+                            VStack{
+                                Text(String(format: "#%03d",  evolutionCell.firt.id))
+                                    .font(.system(size: 17))
+                                Text(evolutionCell.firt.name)
+                                    .font(.system(size: 17))
+                            }
+                        }
+                        Text(">")
+                        HStack{
+                            KFImage(URL(string: evolutionCell.second.shape)!)
+                            VStack(alignment: .leading){
+                                Text(String(format: "#%03d",  evolutionCell.second.id))
+                                    .font(.system(size: 17))
+                                Text(evolutionCell.second.name)
+                                    .font(.system(size: 17))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .opacity(detailViewModel.evolutions.isEmpty ? 0 : 1)
+        
+    }
+    
     private func detailBodyView() -> some View {
         VStack{
             PokemonDetailHeader()
             PokemonDetailInformation()
+            evolutionView()
+            //PokemonEvolutionView(url: detailViewModel.pokemonModel.evolutionChain)
 
         }
     }

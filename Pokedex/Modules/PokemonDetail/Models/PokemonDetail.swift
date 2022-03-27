@@ -23,4 +23,6 @@ struct PokemonDetail: Codable {
     var defaultSprite: String
     var shinySprite: String
     var isLegendary: Bool
+    var evolutionChain: String
+
 }

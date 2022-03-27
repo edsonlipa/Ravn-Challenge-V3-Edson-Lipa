@@ -10,10 +10,12 @@ import Combine
 
 class PokemonDetailViewModel: ObservableObject {
     @Published var id: Int = 0
+    @Published var stringUrl: String = ""
     @Published var pokemonModel: PokemonDetail
     @Published var spriteIndex = 0
     @Published var showAlert = false
     @Published var showErrorMessage = false
+    @Published var evolutions = [PokemonEvolutionCell]()
 
     private var cancellables = Set<AnyCancellable>()
     private let service: PokeApiServiceType
@@ -23,6 +25,8 @@ class PokemonDetailViewModel: ObservableObject {
 
     let getPokemonSpeciesRequest = PassthroughSubject<Void, Never>()
     let getPokemonRequest = PassthroughSubject<Void, Never>()
+    let getPokemonEvolutionsRequest = PassthroughSubject<String, Never>()
+    let getPokemonByNameRequest = PassthroughSubject<String, Never>()
 
     let didThrowError = PassthroughSubject<Void, Never>()
     
@@ -49,15 +53,24 @@ class PokemonDetailViewModel: ObservableObject {
             description: "description",
             defaultSprite: "defaultSprite url",
             shinySprite: "shinySprite url",
-            isLegendary: false)
+            isLegendary: false,
+            evolutionChain: "https://pokeapi.co/api/v2/evolution-chain/73"
+        )
         
         setPokemonSpeciesSubscriptions()
         setPokemonSubscriptions()
+        setPokemonEvolutionsSubscriptions()
+        setPokemonNameSubscriptions()
     }
     
     func getPokemon(id: Int) {
         self.id = id
         self.getPokemonSpeciesRequest.send()
+    }
+    
+    func getEvolutions(stringUrl: String ) {
+        self.stringUrl = stringUrl
+        getPokemonEvolutionsRequest.send(stringUrl)
     }
     
     private func setPokemonSpeciesSubscriptions() {
@@ -91,8 +104,6 @@ class PokemonDetailViewModel: ObservableObject {
             }
             .sink { [weak self] response in
 
-//                let evolutionChain: EvolutionChain
-//                self?.isLoading = false
                 self?.getPokemonRequest.send()
 
                 self?.pokemonModel.id = response.id
@@ -104,6 +115,9 @@ class PokemonDetailViewModel: ObservableObject {
                 }
                 self?.pokemonModel.backgroundColor = response.color.name
                 self?.pokemonModel.isLegendary = response.isLegendary
+                self?.pokemonModel.evolutionChain = response.evolutionChain.url
+        
+                self?.getEvolutions(stringUrl: response.evolutionChain.url)
                 
             }
             .store(in: &cancellables)
@@ -156,6 +170,107 @@ class PokemonDetailViewModel: ObservableObject {
                         name: types.type.name.capitalizingFirstLetter()
                     )
                 }
+            }
+            .store(in: &cancellables)
+
+        result
+            .filter { !$0.isSuccessful }
+            .sink { [weak self] error in
+                self?.showAlert = true
+                self?.showErrorMessage = true
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func setPokemonEvolutionsSubscriptions() {
+        let result = getPokemonEvolutionsRequest
+            .handleEvents(receiveOutput: { [weak self] _ in
+                self?.isEvolutionLoading = true
+            })
+            .map { [service, weak self] value -> AnyPublisher<Result<PokemonEvolutionResponse, Error>, Never> in
+                return service.fetchPokemonEvolutions(stringURL: value)
+                    .map { .success($0) }
+                    .catch { Just(.failure($0)) }
+                    .eraseToAnyPublisher()
+            }
+            .switchToLatest()
+            .receive(on: DispatchQueue.main)
+            .handleEvents(receiveOutput: { [weak self] _ in
+                self?.isEvolutionLoading = false
+
+            })
+            .share()
+        
+        result
+            .filter { $0.isSuccessful }
+            .compactMap { result -> PokemonEvolutionResponse? in
+                switch result {
+                case .success(let response):
+                    return response
+                default:
+                    return nil
+                }
+            }
+            .sink { [weak self] response in
+                self?.evolutions = [PokemonEvolutionCell]()
+                var evolveFrom: PokemonEvolutionResponse.ChainLink = response.chain
+                while !evolveFrom.evolvesTo.isEmpty {
+                    if  evolveFrom.species.name == self?.pokemonModel.name {
+                        print( "Exito \(evolveFrom.species.name )"    )
+
+                        evolveFrom.evolvesTo.forEach{ evolution in
+                            print(evolution.species.name)
+                            self?.getPokemonByNameRequest.send(evolution.species.name)
+                        }
+                        break
+                    }
+                    evolveFrom = evolveFrom.evolvesTo[0]
+
+                }
+                
+            }
+            .store(in: &cancellables)
+
+        result
+            .filter { !$0.isSuccessful }
+            .sink { [weak self] error in
+                self?.showAlert = true
+                self?.showErrorMessage = true
+                print("Error!!")
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func setPokemonNameSubscriptions() {
+        let result = getPokemonByNameRequest
+            .map { [service, weak self] name -> AnyPublisher<Result<PokemonResponse, Error>, Never> in
+                service.fetchPokemon(name: name)
+                    .map { .success($0) }
+                    .catch { Just(.failure($0)) }
+                    .eraseToAnyPublisher()
+            }
+            .switchToLatest()
+            .receive(on: DispatchQueue.main)
+
+            .share()
+        
+        result
+            .filter { $0.isSuccessful }
+            .compactMap { result -> PokemonResponse? in
+                switch result {
+                case .success(let response):
+                    return response
+                default:
+                    return nil
+                }
+            }
+            .sink { [weak self] response in
+                print("pokemon added")
+                guard let self = self else {
+                    return                }
+                let evolutionTo = PokemonEvolution(id: response.id, name: response.name, shape: response.sprites.frontDefault)
+                let evolutionfrom = PokemonEvolution(id: self.pokemonModel.id, name:  self.pokemonModel.name, shape:  self.pokemonModel.defaultSprite)
+                self.evolutions.append(PokemonEvolutionCell(firt: evolutionfrom, second: evolutionTo))
             }
             .store(in: &cancellables)
 
