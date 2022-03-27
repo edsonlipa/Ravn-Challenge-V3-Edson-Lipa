@@ -7,31 +7,45 @@
 
 import SwiftUI
 
-@available(iOS 15.0, *)
 struct PokemonListView: View {
     @ObservedObject var listViewModel = PokemonListViewModel()
+    @State private var navigate = false
+    @State private var id = 0
 
     var body: some View {
         NavigationView {
             ZStack {
                 List {
                     ForEach(listViewModel.pokemonClassifications, id: \.id) { classification in
-                        Section(content: {
+                        VStack {
+                            sectionHeader(classification: classification)
+                            
                             ForEach(listViewModel.pokemonsGrouped[classification]
                                     ?? [PokemonListItem](), id: \.id) { item in
                                 PokemonListCellView(item: item)
                                     .frame(height: 80)
-                                    .listRowBackground(Color(UIColor.systemGray6))
-                                    .listRowSeparator(.hidden)
                                     .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                                    .onTapGesture {
+                                        navigate.toggle()
+                                        self.id = item.id
+                                    }
                             }
-                        }, header: {
-                            Text(classification)
-                        })
+                        }
                     }
+                    .listRowBackground(Color(UIColor.systemGray6))
+                    .listRowSeparator(.hidden)
+                    .buttonStyle(PlainButtonStyle())
+
                 }
                 .navigationTitle("Pokémon List")
                 .opacity(listViewModel.showAlert ? 0 : 1)
+                
+                NavigationLink(isActive: $navigate){
+                    PokemonDetailView(id: id)
+                } label: {
+                    EmptyView()
+                }
+                .opacity(.zero)
                 
                 erroTextView()
                     .opacity(listViewModel.showErrorMessage ? 1 : 0)
@@ -61,6 +75,18 @@ struct PokemonListView: View {
                 .foregroundColor(.red)
             
             Spacer()
+        }
+    }
+    
+    func sectionHeader(classification: String) -> some View {
+        VStack(alignment: .leading) {
+            Text(classification)
+                .font(.system(size: 20))
+
+            Rectangle()
+                .fill(.black)
+                .frame(height: 1)
+                .edgesIgnoringSafeArea(.horizontal)
         }
     }
 }

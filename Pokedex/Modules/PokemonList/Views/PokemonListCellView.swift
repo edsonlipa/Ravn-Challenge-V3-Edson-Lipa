@@ -48,9 +48,6 @@ struct PokemonListCellView: View {
                 
             }
         }
-        .overlay( NavigationLink(destination: PokemonDetailView(id: item.id), label: {
-            EmptyView()
-        }))
     }
 }
 
