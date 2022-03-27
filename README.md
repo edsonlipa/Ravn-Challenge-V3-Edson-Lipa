@@ -29,9 +29,9 @@
 git clone https://github.com/edsonlipa/Ravn-Challenge-V3-Edson-Lipa.git
 ```
 ## Images
-![Alt text](Images/Image1.png "List Pokemons")
-![Alt text](Images/Image2.png "Searching Pokemons")
-![Alt text](Images/Image3.png "Detail View")
+![Alt text](Images/Image_1.png "List Pokemons")
+![Alt text](Images/Image_2.png "Searching Pokemons")
+![Alt text](Images/Image_3.png "Detail View")
 
 ## Technologies used
 
