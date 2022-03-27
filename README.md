@@ -36,7 +36,7 @@ git clone https://github.com/edsonlipa/Ravn-Challenge-V3-Edson-Lipa.git
 ## Technologies used
 
 * Swift 5
-* GraphQL API - Provided data with mutations
+* Combine
 * Apollo Client - It allows you to execute queries and mutations against a GraphQL server
 * Kingfisher - Kingfisher is a powerful, pure-Swift library for downloading and caching images from the web
 
