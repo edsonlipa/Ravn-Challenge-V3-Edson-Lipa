@@ -7,7 +7,7 @@
 
 import Foundation
 
-class PokemonResponse: Codable, Identifiable {
+struct PokemonResponse: Codable, Identifiable {
     struct Sprites: Codable{
         let frontDefault: String
         let frontShiny: String
@@ -27,6 +27,5 @@ class PokemonResponse: Codable, Identifiable {
     let name: String
     let sprites: Sprites
     let types: [TypesResponse]
-    
     
 }

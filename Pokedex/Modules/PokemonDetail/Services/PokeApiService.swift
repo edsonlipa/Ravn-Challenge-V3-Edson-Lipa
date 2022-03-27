@@ -10,7 +10,6 @@ import Combine
 import SwiftUI
 
 protocol PokeApiServiceType {
-    func execute(for url: URL) -> AnyPublisher<Data, Error>
     func fetchPokemonSpecies(id: Int) -> AnyPublisher<PokemonSpeciesResponse, Error>
     func fetchPokemon(id: Int) -> AnyPublisher<PokemonResponse, Error>
     func fetchPokemonEvolutions(stringURL: String) -> AnyPublisher<PokemonEvolutionResponse, Error>
@@ -19,10 +18,7 @@ protocol PokeApiServiceType {
 
 struct PokeApiService: PokeApiServiceType {
 
-    
-    
     let baseURL = "https://pokeapi.co/api/v2"
-//    let baseURL = "https://pokeapi.co/api"
     let decoder: JSONDecoder
     let session: URLSession
 
@@ -35,20 +31,7 @@ struct PokeApiService: PokeApiServiceType {
         self.session = session
     }
     
-    func execute(for url: URL) -> AnyPublisher<Data, Error> {
-        session
-            .dataTaskPublisher(for: url)
-            .tryMap { element -> Data in
-                guard let httpResponse = element.response as? HTTPURLResponse,
-                    httpResponse.statusCode == 200
-                else {
-                    print("badServerResponse")
-                    throw URLError(.badServerResponse)
-                }
-                return element.data
-            }
-            .eraseToAnyPublisher()
-    }
+
     
     func fetchPokemonSpecies(id: Int) -> AnyPublisher<PokemonSpeciesResponse, Error> {
         let finalURL = baseURL + "/pokemon-species/\(id)"
@@ -81,4 +64,21 @@ struct PokeApiService: PokeApiServiceType {
         
     }
 
+}
+
+extension PokeApiService {
+    func execute(for url: URL) -> AnyPublisher<Data, Error> {
+        session
+            .dataTaskPublisher(for: url)
+            .tryMap { element -> Data in
+                guard let httpResponse = element.response as? HTTPURLResponse,
+                    httpResponse.statusCode == 200
+                else {
+                    print("badServerResponse")
+                    throw URLError(.badServerResponse)
+                }
+                return element.data
+            }
+            .eraseToAnyPublisher()
+    }
 }

@@ -12,7 +12,6 @@ import Apollo
 typealias Pokemon = PokemonsQuery.Data.Pokemon
 
 protocol GraphQLPokemonApiServiceType {
-    func execute<T: GraphQLQuery>(for query: T) -> AnyPublisher<T.Data, Error>
     func fetchPokemons() -> AnyPublisher<[Pokemon], Error>
 }
 
@@ -40,6 +39,11 @@ struct GraphQLPokemonApiService: GraphQLPokemonApiServiceType {
             .eraseToAnyPublisher()
     }
     
+
+}
+
+extension GraphQLPokemonApiService {
+    
     internal func execute<T>(for query: T) -> AnyPublisher<T.Data, Error> where T: GraphQLQuery {
         Future<T.Data, Error> { [weak client] promise in
             client?.fetch(query: query) { result in
@@ -59,4 +63,5 @@ struct GraphQLPokemonApiService: GraphQLPokemonApiServiceType {
         .eraseToAnyPublisher()
     }
 }
+
 

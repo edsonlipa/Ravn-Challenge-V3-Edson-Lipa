@@ -187,7 +187,7 @@ class PokemonDetailViewModel: ObservableObject {
             .handleEvents(receiveOutput: { [weak self] _ in
                 self?.isEvolutionLoading = true
             })
-            .map { [service, weak self] value -> AnyPublisher<Result<PokemonEvolutionResponse, Error>, Never> in
+            .map { [service] value -> AnyPublisher<Result<PokemonEvolutionResponse, Error>, Never> in
                 return service.fetchPokemonEvolutions(stringURL: value)
                     .map { .success($0) }
                     .catch { Just(.failure($0)) }
@@ -240,10 +240,10 @@ class PokemonDetailViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
-    
+
     private func setPokemonNameSubscriptions() {
         let result = getPokemonByNameRequest
-            .map { [service, weak self] name -> AnyPublisher<Result<PokemonResponse, Error>, Never> in
+            .map { [service] name -> AnyPublisher<Result<PokemonResponse, Error>, Never> in
                 service.fetchPokemon(name: name)
                     .map { .success($0) }
                     .catch { Just(.failure($0)) }
