@@ -30,8 +30,8 @@ git clone https://github.com/edsonlipa/Ravn-Challenge-V3-Edson-Lipa.git
 ```
 ## Images
 ![Alt text](Images/Image1.png "List Pokemons")
-![Alt text](Images/Image1.png "Searching Pokemons")
-![Alt text](Images/Image1.png "Detail View")
+![Alt text](Images/Image2.png "Searching Pokemons")
+![Alt text](Images/Image3.png "Detail View")
 
 ## Technologies used
 
@@ -41,5 +41,5 @@ git clone https://github.com/edsonlipa/Ravn-Challenge-V3-Edson-Lipa.git
 * Kingfisher - Kingfisher is a powerful, pure-Swift library for downloading and caching images from the web
 
 ## APIs Used
-* List Pokemons[GraphQL Api](https://wayfair.github.io/dociql/)
-* Detail Pokemons[Rest Api](https://pokeapi.co/docs/v2) 
+* List Pokemons [GraphQL Api](https://wayfair.github.io/dociql/)
+* Detail Pokemons [Rest Api](https://pokeapi.co/docs/v2) 
