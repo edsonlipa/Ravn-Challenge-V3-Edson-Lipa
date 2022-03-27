@@ -29,9 +29,9 @@
 git clone https://github.com/edsonlipa/Ravn-Challenge-V3-Edson-Lipa.git
 ```
 ## Images
-![Alt text](Images/Simulator Screen Shot - iPhone 13 1.png "List Pokemons")
-![Alt text](Images/Simulator Screen Shot - iPhone 13 2.png "Searching Pokemons")
-![Alt text](Images/Simulator Screen Shot - iPhone 13 3.png "Detail View")
+![Alt text](Images/Image1.png "List Pokemons")
+![Alt text](Images/Image1.png "Searching Pokemons")
+![Alt text](Images/Image1.png "Detail View")
 
 ## Technologies used
 
